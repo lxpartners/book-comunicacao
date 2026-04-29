@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Five Credit — Plataforma Interna</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4ff;--surface:#fff;--surface2:#f8faff;
+  --blue:#1a3fd4;--blue2:#0f2ba8;--blue-light:#e8eeff;--blue-mid:#4a6ef5;
+  --text:#0d1333;--text2:#3d4a7a;--text3:#7a87b8;
+  --border:#dce3f8;--border2:#b0beee;
+  --ok:#00a878;--ok-bg:#edfff9;
+  --err:#dc3545;--err-bg:#fff0f0;
+  --green:#1a7a4a;--green-light:#eafff3;--green-border:#b8e8cc;
+  --radius:10px;
+}
+html{font-size:14px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-weight:400;min-height:100vh}
+
+/* ── HEADER ── */
+.hdr{background:#fff;border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;gap:0;height:68px;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(26,63,212,0.07)}
+.hdr-logo{display:flex;align-items:center;padding-right:28px;border-right:1px solid var(--border);margin-right:4px;flex-shrink:0}
+.hdr-tabs{display:flex;align-items:stretch;height:68px;flex:1}
+.hdr-tab{display:flex;align-items:center;gap:8px;padding:0 20px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;letter-spacing:.02em;position:relative;top:1px}
+.hdr-tab:hover{color:var(--text2);background:var(--bg)}
+.hdr-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-light)}
+.hdr-tab svg{flex-shrink:0;opacity:.7}
+.hdr-tab.active svg{opacity:1}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;padding-left:16px;flex-shrink:0}
+.hdr-badge{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);background:var(--blue-light);border:1px solid rgba(26,63,212,0.2);padding:4px 12px;border-radius:20px}
+.hdr-date{font-size:10px;font-weight:500;color:var(--text3)}
+
+/* ── TAB PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ══════════════════════════════════════════
+   BOOK DE COMUNICAÇÃO — panel styles
+══════════════════════════════════════════ */
+.book-wrap{display:block;min-height:calc(100vh - 68px)}
+.sidebar{display:none}
+
+/* sidebar */
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:20px 0 40px;position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto;overflow-x:hidden}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-search{margin:0 14px 16px;position:relative}
+.sb-search input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px 8px 34px;outline:none;transition:border-color .2s,box-shadow .2s}
+.sb-search input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,63,212,0.1)}
+.sb-search input::placeholder{color:var(--text3);font-weight:300}
+.sb-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.sb-section{padding:14px 18px 5px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.sb-count{background:var(--blue-light);color:var(--blue);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid rgba(26,63,212,0.15)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 18px 7px 16px;cursor:pointer;border-left:2px solid transparent;transition:all .15s;color:var(--text3);font-size:12px;line-height:1.4}
+.nav-item:hover{background:var(--blue-light);color:var(--text2);border-left-color:var(--border2)}
+.nav-item.active{border-left-color:var(--blue);background:var(--blue-light);color:var(--blue);font-weight:600}
+.nav-num{font-size:9px;font-weight:600;color:var(--text3);min-width:20px;text-align:right;flex-shrink:0}
+.nav-item.active .nav-num{color:var(--blue-mid)}
+
+/* main content */
+.book-main{padding:32px 40px 60px;max-width:900px;margin:0 auto;width:100%}
+.hero-card{background:linear-gradient(135deg,var(--blue2) 0%,#2d55e8 60%,var(--blue-mid) 100%);border-radius:16px;padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;color:#fff}
+.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 14px;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.9);margin-bottom:16px;position:relative}
+.hero-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;position:relative;line-height:1.2}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.7;position:relative;max-width:480px}
+.hero-stats{display:flex;margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.15);position:relative}
+.stat{flex:1;display:flex;flex-direction:column;gap:3px;padding-right:28px;border-right:1px solid rgba(255,255,255,0.15);margin-right:28px}
+.stat:last-child{border-right:none;margin-right:0;padding-right:0}
+.stat-num{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px;line-height:1}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5)}
+.search-row{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.search-wrap{flex:1;position:relative}
+.search-icon-main{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.search-input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 16px 10px 42px;outline:none;transition:border-color .2s,box-shadow .2s;box-shadow:0 2px 8px rgba(26,63,212,0.04)}
+.search-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,63,212,0.1)}
+.search-input::placeholder{color:var(--text3);font-weight:300}
+.results-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:10px;font-weight:600;color:var(--text3);white-space:nowrap}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px}
+.ftag{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--text3);font-family:'Inter',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(26,63,212,0.04)}
+.ftag:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-light)}
+.ftag.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,63,212,0.28)}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color .18s,box-shadow .18s;box-shadow:0 2px 12px rgba(26,63,212,0.04)}
+.tcard:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(26,63,212,0.08)}
+.tcard.expanded{border-color:var(--blue-mid);box-shadow:0 2px 16px rgba(26,63,212,0.1)}
+.tcard.hidden{display:none}
+.card-hdr{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;transition:background .15s}
+.card-hdr:hover{background:var(--surface2)}
+.tcard.expanded .card-hdr{background:var(--blue-light)}
+.card-num-badge{width:30px;height:30px;background:var(--blue-light);border:1px solid rgba(26,63,212,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--blue);flex-shrink:0;margin-top:2px}
+.tcard.expanded .card-num-badge{background:var(--blue);border-color:var(--blue);color:#fff}
+.card-meta{flex:1;min-width:0}
+.card-title{font-weight:600;font-size:13px;color:var(--text);margin-bottom:7px;line-height:1.4}
+.card-tags{display:flex;flex-wrap:wrap;gap:5px}
+.ctag{padding:2px 9px;background:var(--blue-light);border:1px solid rgba(26,63,212,0.12);border-radius:20px;font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.5px;text-transform:uppercase}
+.ctag.code{background:var(--surface2);border-color:var(--border2);color:var(--text3);text-transform:none;letter-spacing:0;font-weight:500}
+.card-chevron{color:var(--text3);flex-shrink:0;transition:transform .2s,color .15s;margin-top:5px}
+.tcard.expanded .card-chevron{transform:rotate(180deg);color:var(--blue)}
+.card-body{display:none;padding:0 22px 22px;border-top:1px solid var(--border);background:var(--surface2)}
+.tcard.expanded .card-body{display:block}
+.card-subject{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin:16px 0 10px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 4px rgba(26,63,212,0.04)}
+.subject-label{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);flex-shrink:0;padding-top:3px;white-space:nowrap}
+.subject-text{font-size:12px;color:var(--text2);font-style:italic;flex:1;line-height:1.5}
+.card-body-content{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:12px;color:var(--text2);line-height:1.8;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 4px rgba(26,63,212,0.04)}
+.var-tag{display:inline;background:#e8eeff;border:1px solid rgba(26,63,212,0.25);border-radius:4px;padding:1px 5px;font-family:'Inter',monospace;font-size:10px;color:var(--blue);font-weight:600}
+.card-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;border:1.5px solid transparent}
+.btn-ghost{background:var(--surface);border-color:var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-light)}
+.btn-primary{background:linear-gradient(135deg,var(--blue2),var(--blue-mid));border:none;color:#fff;box-shadow:0 4px 14px rgba(26,63,212,0.3)}
+.btn-primary:hover{opacity:.9}
+.btn-primary.copied{background:var(--ok);box-shadow:0 4px 14px rgba(0,168,120,0.3)}
+.no-results{display:none;flex-direction:column;align-items:center;text-align:center;padding:64px 20px;color:var(--text3);font-size:12px;gap:12px}
+.no-results-icon{width:52px;height:52px;background:var(--blue-light);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--blue)}
+mark{background:rgba(26,63,212,0.12);color:var(--blue);border-radius:3px;padding:0 2px;font-weight:600}
+.page-footer{margin-top:40px;padding:18px 0;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;color:var(--text3);font-size:11px}
+.page-footer a{color:var(--blue-mid);text-decoration:none}
+.page-footer a:hover{text-decoration:underline}
+
+/* ══════════════════════════════════════════
+   FLUXO DE TAREFAS — panel styles
+══════════════════════════════════════════ */
+.fluxo-wrap{max-width:900px;margin:0 auto;padding:32px 40px 60px;width:100%}
+
+/* legend */
+.leg-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px;box-shadow:0 2px 8px rgba(26,63,212,0.04)}
+.leg-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-right:4px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--text2);padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface2)}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* phases */
+.phases-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ph{flex:1;min-width:80px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:11px;font-weight:700;text-align:center;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 1px 4px rgba(26,63,212,0.04)}
+.ph-count{display:block;font-size:9px;font-weight:400;color:var(--text3);margin-bottom:2px;text-transform:none;letter-spacing:0}
+.ph:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-light)}
+.ph.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,63,212,0.28)}
+.ph.active .ph-count{color:rgba(255,255,255,0.7)}
+
+/* progress */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.prog-track{flex:1;height:5px;background:var(--border);border-radius:5px;overflow:hidden}
+.prog-bar-f{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--blue2),var(--blue-mid));transition:width .35s}
+.prog-lbl{font-size:11px;color:var(--blue);font-weight:700;white-space:nowrap}
+
+/* step cards */
+.step-card{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);transition:border-color .15s,box-shadow .15s;background:var(--surface);margin-bottom:8px;box-shadow:0 2px 8px rgba(26,63,212,0.04)}
+.step-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(26,63,212,0.08)}
+.step-card.open{border-color:var(--blue-mid);box-shadow:0 2px 16px rgba(26,63,212,0.12)}
+.step-head{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;background:var(--surface2);transition:background .15s}
+.step-head:hover{background:var(--blue-light)}
+.step-card.open .step-head{background:var(--blue)}
+.step-num{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:var(--blue-light);color:var(--blue);border:1px solid rgba(26,63,212,0.2)}
+.step-card.open .step-num{background:#fff;color:var(--blue);border-color:transparent}
+.step-text{flex:1;min-width:0}
+.step-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.35}
+.step-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.step-card.open .step-title,.step-card.open .step-sub{color:#fff}
+.step-card.open .step-sub{color:rgba(255,255,255,.75)}
+.step-badges{display:flex;flex-wrap:wrap;gap:4px;flex-shrink:0;max-width:200px;justify-content:flex-end}
+.sbadge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;letter-spacing:.3px;text-transform:uppercase}
+.b-emp{background:#E6F1FB;color:#0C447C;border-color:#85B7EB}
+.b-cre{background:#EAF3DE;color:#27500A;border-color:#97C459}
+.b-bac{background:#FAEEDA;color:#633806;border-color:#EF9F27}
+.b-con{background:#FBEAF0;color:#72243E;border-color:#D4537E}
+.b-com{background:#EEEDFE;color:#3C3489;border-color:#7F77DD}
+.b-dec{background:#FAECE7;color:#4A1B0C;border-color:#D85A30}
+.step-card.open .sbadge{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:#fff}
+.step-chev{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.step-card.open .step-chev{transform:rotate(180deg);color:#fff}
+.step-detail{display:none;padding:14px 16px 16px 58px;border-top:1px solid var(--border);background:var(--surface2)}
+.step-card.open .step-detail{display:block;border-top-color:rgba(26,63,212,.1);background:#fafbff}
+.detail-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.detail-list li{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text2);line-height:1.55}
+.detail-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:5px}
+.detail-note{font-size:11px;color:var(--text2);margin-top:10px;padding:8px 12px;border-radius:8px;background:var(--blue-light);border:1px solid rgba(26,63,212,.12);display:flex;gap:8px;align-items:flex-start}
+.detail-note::before{content:'ℹ';font-size:12px;color:var(--blue);flex-shrink:0;line-height:1.4}
+
+/* ══════════════════════════════════════════
+   COMPLIANCE — panel styles
+══════════════════════════════════════════ */
+.comp-wrap{max-width:900px;margin:0 auto;padding:32px 40px 60px;width:100%}
+.comp-hero{background:linear-gradient(135deg,var(--blue2) 0%,#2d55e8 60%,var(--blue-mid) 100%);border-radius:16px;padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;color:#fff}
+.comp-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:220px;height:220px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none}
+.comp-acc{display:flex;flex-direction:column;gap:8px}
+.cacc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .18s,box-shadow .18s;box-shadow:0 2px 12px rgba(26,63,212,0.04)}
+.cacc-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(26,63,212,0.08)}
+.cacc-card.open{border-color:var(--blue-mid);box-shadow:0 2px 16px rgba(26,63,212,0.1)}
+.cacc-hdr{display:flex;align-items:center;gap:12px;padding:15px 20px;cursor:pointer;user-select:none;transition:background .15s}
+.cacc-hdr:hover{background:var(--surface2)}
+.cacc-card.open .cacc-hdr{background:var(--blue-light)}
+.cacc-badge{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.04em;flex-shrink:0;background:var(--blue-light);color:var(--blue);border:1px solid rgba(26,63,212,0.15)}
+.cacc-card.open .cacc-badge{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cacc-title{flex:1;font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.cacc-count{font-size:10px;color:var(--text3);margin-right:4px;white-space:nowrap}
+.cacc-chev{color:var(--text3);transition:transform .2s,color .15s;flex-shrink:0}
+.cacc-card.open .cacc-chev{transform:rotate(180deg);color:var(--blue)}
+.cacc-body{display:none;padding:0 20px 18px;border-top:1px solid var(--border);background:var(--surface2)}
+.cacc-card.open .cacc-body{display:block}
+.cacc-desc{font-size:12px;color:var(--text2);line-height:1.7;padding:14px 0 10px}
+.cacc-items{display:flex;flex-direction:column;gap:5px}
+.cacc-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);transition:border-color .12s,background .12s}
+.cacc-item:hover{border-color:var(--border2);background:var(--blue-light)}
+.cacc-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.cacc-item-title{font-size:12px;font-weight:600;color:var(--text);line-height:1.4}
+.cacc-item-note{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.5}
+
+@media(max-width:800px){
+  .book-main{padding:20px}
+  .hdr{padding:0 16px}
+  .hdr-logo{padding-right:12px}
+  .hdr-tab{padding:0 12px;font-size:11px}
+  .fluxo-wrap{padding:20px}
+  .comp-wrap{padding:20px}
+  .hero-card{padding:24px 20px;border-radius:12px}
+  .hero-title{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <svg width="108" height="46" viewBox="0 0 108 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <text x="4" y="36" font-family="Arial Black,Arial,sans-serif" font-size="22" font-weight="900" fill="#0000FF">FIVE</text>
+      <text x="44" y="44" font-family="Arial,sans-serif" font-size="11" font-weight="400" fill="#000000" letter-spacing="0.3">credit</text>
+      <rect x="69" y="3"  width="11" height="4" fill="#0000FF"/>
+      <rect x="69" y="7"  width="4"  height="4" fill="#0000FF"/>
+      <rect x="77" y="11" width="4"  height="4" fill="#0000FF"/>
+      <rect x="69" y="15" width="11" height="4" fill="#0000FF"/>
+    </svg>
+  </div>
+  <div class="hdr-tabs">
+    <div class="hdr-tab active" id="tab-book" onclick="switchTab('book')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6h6M5 9h4"/></svg>
+      Book de Comunicação
+    </div>
+    <div class="hdr-tab" id="tab-fluxo" onclick="switchTab('fluxo')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="3" r="1.5"/><circle cx="13" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/><path d="M4.5 8h7M8 4.5v7"/></svg>
+      Fluxo de Tarefas
+    </div>
+    <div class="hdr-tab" id="tab-compliance" onclick="switchTab('compliance')">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2L3 4.5v4C3 11.5 5.5 14 8 15c2.5-1 5-3.5 5-6.5v-4L8 2z"/></svg>
+      Política de Compliance
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-date" id="hdrDate"></span>
+    <div class="hdr-badge">Uso Interno</div>
+  </div>
+</div>
+
+<!-- ══ PANEL: BOOK DE COMUNICAÇÃO ══ -->
+<div class="panel active" id="panel-book">
+  <div class="book-wrap">
+    <div class="sidebar">
+      <div class="sb-search">
+        <svg class="sb-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" id="sidebarSearch" placeholder="Pesquisar templates..." oninput="syncSearch(this.value)">
+      </div>
+      <div class="sb-section">Templates de Email <span class="sb-count" id="emailCount">20</span></div>
+      <div id="sidebarNav"></div>
+    </div>
+    <div class="book-main">
+      <div class="hero-card">
+        <div class="hero-badge"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> Comunicação Institucional · Five Credit</div>
+        <div class="hero-title">Templates de Email</div>
+        <div class="hero-sub">Repositório centralizado de todos os templates de comunicação da plataforma. Pesquise, filtre e copie directamente para uso imediato.</div>
+        <div class="hero-stats">
+          <div class="stat"><div class="stat-num">20</div><div class="stat-label">Templates</div></div>
+          <div class="stat"><div class="stat-num" id="varCount">—</div><div class="stat-label">Variáveis</div></div>
+          <div class="stat"><div class="stat-num">7</div><div class="stat-label">Categorias</div></div>
+        </div>
+      </div>
+      <div class="search-row">
+        <div class="search-wrap">
+          <svg class="search-icon-main" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input class="search-input" type="text" id="mainSearch" placeholder="Pesquisar por título, assunto ou conteúdo..." oninput="doSearch(this.value)">
+        </div>
+        <div class="results-pill" id="resultsCount">20 templates</div>
+      </div>
+      <div class="filters">
+        <button class="ftag active" onclick="setFilter('all',this)">Todos</button>
+        <button class="ftag" onclick="setFilter('registo',this)">Registo</button>
+        <button class="ftag" onclick="setFilter('candidatura',this)">Candidatura</button>
+        <button class="ftag" onclick="setFilter('contabilista',this)">Contabilista</button>
+        <button class="ftag" onclick="setFilter('kyc',this)">KYC &amp; ESG</button>
+        <button class="ftag" onclick="setFilter('contrato',this)">Contrato</button>
+        
+        <button class="ftag" onclick="setFilter('manutencao',this)">Manutenção</button>
+      </div>
+      <div id="templateList"></div>
+      <div class="no-results" id="noResults">
+        <div class="no-results-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
+        <strong style="color:var(--text2);font-size:13px">Nenhum template encontrado</strong>
+        <span>Tente pesquisar com termos diferentes</span>
+      </div>
+      <div class="page-footer">
+        <span>© 2026 Five Credit · Circle Capital – SGOIC, S.A. · Uso Interno</span>
+        <a href="https://fivecredit.pt" target="_blank">fivecredit.pt ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL: FLUXO DE TAREFAS ══ -->
+<div class="panel" id="panel-fluxo">
+  <div class="fluxo-wrap">
+
+    <div class="hero-card" style="margin-bottom:24px">
+      <div class="hero-badge"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> Processo Interno · Five Credit</div>
+      <div class="hero-title">Fluxo de Tarefas</div>
+      <div class="hero-sub">Processo de candidatura a financiamento — clique numa fase e expanda cada passo para ver os detalhes.</div>
+    </div>
+
+    <div class="leg-bar">
+      <span class="leg-label">Intervenientes</span>
+      <span class="leg"><span class="leg-dot" style="background:#85B7EB"></span>Empresa</span>
+      <span class="leg"><span class="leg-dot" style="background:#97C459"></span>Creditscore</span>
+      <span class="leg"><span class="leg-dot" style="background:#EF9F27"></span>Backoffice</span>
+      <span class="leg"><span class="leg-dot" style="background:#D4537E"></span>Contabilista</span>
+      <span class="leg"><span class="leg-dot" style="background:#7F77DD"></span>Compliance</span>
+      <span class="leg"><span class="leg-dot" style="background:#D85A30"></span>Declarante</span>
+    </div>
+
+    <div class="phases-row" id="phases"></div>
+    <div class="prog-row">
+      <div class="prog-track"><div class="prog-bar-f" id="progBar"></div></div>
+      <span class="prog-lbl" id="progLabel">Fase 1 de 6</span>
+    </div>
+    <div id="stepsList"></div>
+
+  </div>
+</div>
+<!-- ══ PANEL: POLÍTICA DE COMPLIANCE ══ -->
+<div class="panel" id="panel-compliance">
+  <div class="comp-wrap">
+    <div class="comp-hero">
+      <div class="hero-badge"><svg width="6" height="6" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg> Regulamentação Interna · Circle Capital</div>
+      <div class="hero-title">Política de Compliance</div>
+      <div class="hero-sub">Versão 1 · 27 de fevereiro de 2023 · Aprovada pelo Conselho de Administração. Clique em cada secção para expandir o seu conteúdo.</div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">7</div><div class="stat-label">Secções</div></div>
+        <div class="stat"><div class="stat-num">8</div><div class="stat-label">Princípios</div></div>
+        <div class="stat"><div class="stat-num">15</div><div class="stat-label">Objetivos Compliance</div></div>
+      </div>
+    </div>
+    <div class="comp-acc" id="compAcc"></div>
+    <div class="page-footer">
+      <span>© 2026 Five Credit · Circle Capital – SGOIC, S.A. · Uso Interno</span>
+      <a href="https://fivecredit.pt" target="_blank">fivecredit.pt ↗</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){var d=new Date();document.getElementById('hdrDate').textContent=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();})();
+/* ── TAB SWITCHER ── */
+function switchTab(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.hdr-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   BOOK DE COMUNICAÇÃO — data & logic
+══════════════════════════════════════ */
+const T=[
+  {n:1,title:"Autenticação de Email no Processo de Registo",code:"SIGNUP-EMAIL-VALIDATION",tags:["registo"],subj:"Five Credit – Criação de conta e validação de email.",body:"Olá,\n\nBem-Vindo ao Portal Five Credit!\n\nRecebemos um pedido de registo com este email. Por motivos de segurança é importante confirmar a sua identidade.\n\nPara continuar o processo de registo, por favor, insira o seguinte Código, no campo indicado na Plataforma.\n\n{{validationcode}}\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:2,title:"Confirmação de Registo",code:"SIGNUP-FINISHED",tags:["registo"],subj:"Five Credit – Confirmação de registo de conta",body:"Exmo(a) {USER-NAME},\n\nDamos-lhe as boas-vindas à plataforma da Five Credit. O seu registo foi concluído com sucesso!\n\nPara efetuar a sua candidatura a um financiamento Five Credit, faça Login na plataforma, usando o seu Nome de Utilizador e a Password definida.\n\nLER COM ATENÇÃO:\n\nRequisitos\nO produto de financiamento Five Credit destina-se a PMEs com mais de 3 anos de atividade e 75.000 euros de faturação.\n\nPara efetuar a candidatura vai precisar de:\n— Código de acesso à Certidão do Registo Comercial (CRC) da sua empresa\n— Informar o seu Contabilista Certificado de que irá receber um email com um link, para aceder à plataforma e carregar informação financeira necessária à análise do financiamento.\n\nSe, após uma validação inicial passar à fase seguinte, ser-lhe-á solicitado o upload de informação dos sites: Banco de Portugal, Segurança Social, Autoridade Tributária.\n\nSe a candidatura for aceite, dentro do montante máximo estipulado pela Five Credit, receberá um pedido a solicitar-lhe:\n— Informação e documentação necessária ao cumprimento do dever de identificação do Cliente nos termos da Lei n.º 83/2017 de 18 de agosto (\"KYC\") e à análise de risco de crédito e suficiência das garantias, relativamente à empresa e ao(s) avalista(s);\n— Resposta a um breve questionário sobre sustentabilidade (\"ESG\");\n\nA concessão do financiamento está dependente da verificação dos dados declarados pela Empresa candidata, da validação do KYC (empresa e avalistas), da análise e decisão de crédito, bem como da constituição de garantias que a Five Credit considere satisfatórias.\n\nApós aceitação da proposta de financiamento e formalização do contrato disponibilizaremos o montante do financiamento na conta da empresa, para que possa concretizar os seus projetos.\n\nSe a sua candidatura ficar inativa por mais de 30 dias, procederemos à sua eliminação da plataforma, de acordo com a nossa política de gestão de aplicações e a nossa política de privacidade e proteção de dados.\n\nA candidatura a um financiamento é efetuada 100% online, sem custos e sem compromisso. Toda a informação é tratada de forma encriptada e segura, com total respeito pela confidencialidade e privacidade dos seus dados.\n\nSubmeta a sua candidatura ainda hoje e aguarde pela nossa resposta ao seu pedido!\n\nMuito obrigado e até breve,\nEquipa Five Credit\n{IMG-LOGO}"},
+  {n:4,title:"Recusa de Pedido Após Inserção da CRC",code:"",tags:["candidatura"],subj:"Five Credit – Resposta ao pedido de financiamento",body:"Exmo(a) [NOME USER],\n\nO seu interesse no financiamento Five Credit mereceu a nossa melhor atenção.\n\nContudo, informamos que a sua empresa não preenche um ou mais dos requisitos necessários para se candidatar ao mesmo:\n— Pelo menos 3 anos de atividade\n— Inexistência de processos judiciais\n— CAE elegível\n— Vendas superiores a 75.000 euros no último ano com contas fechadas\n\nFique atento aos próximos produtos de financiamento Five Credit, pois poderão ser mais ajustados ao perfil da sua empresa.\n\nApresentamos os nossos melhores cumprimentos.\nEquipa Five Credit"},
+  {n:5,title:"Confirmação de Elegibilidade Após Inserção da CRC",code:"",tags:["candidatura"],subj:"Five Credit – Resposta ao pedido de financiamento",body:"Exmo(a) [NOME USER],\n\nInformamos que a sua empresa é elegível para se candidatar a um financiamento Five Credit.\n\nAvance com a sua candidatura na nossa plataforma, para saber os próximos passos!\n\nAlertamos que, por razões de atualidade da documentação inserida, a candidatura deverá ser concluída no prazo máximo de 60 dias a contar da data de inserção do Código de Acesso à Certidão do Registo Comercial (CRC).\n\nApresentamos os nossos melhores cumprimentos.\nEquipa Five Credit"},
+  {n:6,title:"Envio de Pedido ao Contabilista Certificado para Carregar Informação Financeira",code:"DOSSIER-TOC-INVITE",tags:["contabilista","candidatura"],subj:"Five Credit - Pedido da informação financeira simplificada {DOSSIER-COMPANY-NAME}\n[Nota: Colocar em CC o email da pessoa que fez o registo]",body:"Exmo(a). Senhor(a),\n\nA empresa {DOSSIER-COMPANY-NAME} submeteu na plataforma Five Credit, uma candidatura a um financiamento.\n\nPara efeitos de instrução e análise do pedido de financiamento, a referida empresa solicita-lhe o favor de efetuar o carregamento do(s) documento(s) com informação financeira simplificada, gerado(s) pela aplicação Five Extractor, a partir do ficheiro SAFT de contabilidade antes do apuramento de resultados, referentes a:\n{DOSSIER-BAP-ANO-ANTERIOR}\n{DOSSIER-BAP-ANO-ACTUAL}\n\nFaça o download e instale a aplicação Five Extractor a partir do link:\n[Download e instalação da aplicação Five Extractor...]\nhttps://creditscore.fivecredit.pt/Home/FiveExtractorDownload\n\nPara carregar os documento(s) na plataforma Five Credit, siga o seguinte link:\n[Clique aqui para carregar o(s) documento(s) do(s) ano(s) {DOSSIER-BAP-ANO}...]\n\nEste documento é indispensável para podermos analisar o pedido de financiamento, pelo que recomendamos:\n— Controlo das taxonomias corretas, nomeadamente, na classificação de Financiamentos Obtidos Não Corrente e Corrente\n— Controlo via software externo: pode iniciar a sessão no site da Ordem dos Contabilistas Certificados e aceder ao Excel que lhe permitirá confirmar ausência de erros.\n— Controlo via das mensagens enviadas pelo extractor ao longo do processo.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\nContabilista Certificado: {TOC-NAME}\nAno do exercício: {DOSSIER-BAP-ANO}\n\nEm caso de dúvida, por favor, contacte o Responsável por esta candidatura:\nNome: {USER-NAME}\nEmail: {USER-EMAIL}\nTelemóvel: {USER-MOBILE}\n\nMuito obrigado,\nEquipa Five Credit"},
+  {n:7,title:"Email ao Contabilista para Autenticar o Email",code:"TOC-EMAIL-VALIDATION",tags:["contabilista"],subj:"Five Credit – Contabilista Certificado. Validação de dados na plataforma.",body:"Exmo(a). Senhor(a),\n\nA empresa {DOSSIER-COMPANY-NAME} submeteu na plataforma Five Credit a candidatura a um financiamento.\n\nPara efeitos de instrução e avaliação do pedido, a referida empresa solicita-lhe o favor de efetuar o carregamento do(s) ficheiro(s) extraídos pela aplicação Five Extractor, do(s) ano(s):\n{DOSSIER-BAP-ANO-ANTERIOR}\n{DOSSIER-BAP-ANO-ACTUAL}\n\nPor motivos de segurança, antes de proceder ao carregamento da informação, será necessário autenticar o email disponibilizado pelo Responsável por esta candidatura, para confirmar a sua identidade.\n\nPara continuar este processo, por favor insira o seguinte código, no campo indicado na plataforma:\n\n{VALIDATION-CODE}\n\n(*) - Este código é válido até {VALID-UNTIL}. No caso de já ter expirado, clique no botão \"Reenviar\" na página de validação.\n\nFaça o download e instale a aplicação Five Extractor a partir do link:\n[Five Extractor...] https://creditscore.fivecredit.pt/Home/FiveExtractorDownload\n\nLembramos que sem este documento, não poderemos analisar o pedido de financiamento.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\nContabilista Certificado: {TOC-NAME}\nAno do exercício: {DOSSIER-BAP-ANO}\n\nEm caso de dúvida, por favor contacte o Responsável por esta candidatura:\nNome: {USER-NAME}\nEmail: {USER-EMAIL}\nTelemóvel: {USER-MOBILE}\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:8,title:"Informar Utilizador que o Contabilista Carregou a Informação",code:"TOC-SAFT-SUBMITED",tags:["contabilista","candidatura"],subj:"Five Credit – Confirmação de carregamento do documento com informação financeira simplificada pelo Contabilista Certificado.",body:"Exmo(a). Senhor(a),\n\nInformamos que, o Contabilista Certificado da empresa {DOSSIER-COMPANY-NAME} já submeteu na plataforma Five Credit, o(s) documento(s) com informação financeira simplificada, do(s) ano(s) {DOSSIER-BAP-ANO}.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\nContabilista Certificado: {TOC-NAME}\nAno do exercício: {DOSSIER-BAP-ANO}\n\nAceda à plataforma e prossiga com a sua candidatura.\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:9,title:"Agradecer ao Contabilista o Carregamento da Informação",code:"TOC-SAFT-SUBMITED-TOC",tags:["contabilista"],subj:"Five Credit – Confirmação de carregamento do documento financeiro simplificado.",body:"Exmo(a). Senhor(a),\n\nConfirmamos que o(s) documento(s) com Informação Financeira Simplificada foram carregados com sucesso na plataforma Five Credit.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\nContabilista Certificado: {TOC-NAME}\nAno do exercício: {DOSSIER-BAP-ANO}\n\nAgradecemos a sua colaboração!\nEquipa Five Credit"},
+  {n:10,title:"Candidatura Aceite no Scoring – Simulação de Financiamento",code:"DOSSIER-CREDIT-SIMULATOR",tags:["candidatura"],subj:"Five Credit - Candidatura aceite. Simulação de financiamento - {DOSSIER-COMPANY-NAME}",body:"Exmo(a) {USER-NAME},\n\nA empresa {DOSSIER-COMPANY-NAME} submeteu na plataforma da Five Credit, uma candidatura a um financiamento.\n\nCom o objetivo de dar continuidade a este pedido, deverá utilizar o link abaixo indicado, para simular o seu plano de financiamento, dentro do montante máximo estipulado pela Five Credit.\n\n[Clicar aqui...]\n\nSe a sua candidatura ficar inativa por mais de 30 dias, procederemos à sua eliminação da plataforma, de acordo com a nossa política de gestão de aplicações e a nossa política de privacidade e proteção de dados.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nMuito obrigado,\nEquipa Five Credit"},
+  {n:11,title:"Candidatura Não Aceite no Scoring",code:"DOSSIER-REJECTED",tags:["candidatura"],subj:"Five Credit – Resposta ao Pedido de Financiamento",body:"Exmo(a) [NOME USER],\n\nAgradecemos a sua candidatura ao financiamento Five Credit, a qual mereceu a nossa melhor atenção.\n\nContudo, informamos que a empresa não preenche, neste momento, os requisitos necessários para se candidatar ao mesmo.\n\nFique atento aos novos produtos de financiamento Five Credit que disponibilizaremos em breve, pois poderão ser mais ajustados ao perfil da sua empresa.\n\nApresentamos os nossos melhores cumprimentos.\nEquipa Five Credit"},
+  {n:17,title:"Pedido ao Utilizador para Responder ao KYC e ESG",code:"DOSSIER-KYC-USER-START",tags:["kyc","candidatura"],subj:"Five Credit - KYC & ESG - {DOSSIER-COMPANY-NAME}",body:"Exmo(a) {KYC-NAME},\n\nInformamos que, foi iniciado o processo de KYC & ESG, para a seguinte candidatura:\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nPor favor, valide o questionário pré-preenchido com informação extraída da Certidão do Registo Comercial e do Registo Central do Beneficiário Efetivo e complete o mesmo, com a informação em falta (*), no prazo de 30 dias.\n\nPara tal, clique no link abaixo:\n[Responder ao processo de KYC & ESG.]\n\n(*) Para efeitos de cumprimento do dever de identificação do cliente previsto na Lei n.º 83/2017 de 18 de agosto ser-lhe-ão solicitados:\n— Elementos identificativos da empresa candidata, bem como dos respetivos titulares de participações no capital e nos direitos de voto de valor igual ou superior a 5%, dos titulares do órgão de administração ou órgão equivalente, dos representantes legais e beneficiários efetivos;\n— Meios comprovativos: (i) Certidão do Registo Comercial; (ii) RCBE das pessoas coletivas; (iii) Cópia dos documentos de identificação dos titulares do órgão de administração; (iv) Comprovativo de NIF; (v) Ata de deliberação; (vi) Se aplicável, Procuração; (vii) IBAN; (viii) Organograma da empresa candidata.\n\nPara efeitos de análise de risco de crédito e da suficiência de garantias, ser-lhe-ão solicitados, relativamente ao(s) avalista(s):\n— Demonstração de Liquidação de IRS do último ano;\n— Evidência de património extraída do Portal das Finanças (\"Situação Fiscal Integrada\");\n— Três últimos recibos de vencimento;\n— Declaração de não dívida à Autoridade Tributária;\n— Declaração de não dívida à Segurança Social.\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:18,title:"KYC Incompleto – Pedido para Corrigir ou Completar",code:"DOSSIER-KYC-USER-REVIEW",tags:["kyc"],subj:"Five Credit – Revisão KYC & ESG - Processo incompleto - {DOSSIER-COMPANY-NAME}",body:"Exmo(a) {KYC-NAME},\n\nO processo de KYC & ESG para a seguinte candidatura encontra-se incompleto ou contém informação que carece da sua revisão:\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nPor favor, complete ou corrija o mesmo, nos termos solicitados.\n\nPara tal, clique no link abaixo:\n[Rever processo de KYC & ESG.]\n\nMuito obrigado,\nEquipa Five Credit"},
+  {n:19,title:"Confirmação ao Utilizador que o KYC e ESG está Completo",code:"",tags:["kyc"],subj:"Five Credit – KYC & ESG Validado - {DOSSIER-COMPANY-NAME}",body:"Caro(a) {KYC-NAME},\n\nInformamos que, o processo de KYC & ESG foi validado com sucesso:\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:20,title:"Pedido de Informação para Celebração do Contrato (Envio ao User)",code:"DOSSIER-FORM-CONTRACT",tags:["contrato"],subj:"Five Credit – Dados do Contrato - {DOSSIER-COMPANY-NAME}",body:"Exmo(a). {USER-NAME},\n\nA empresa {DOSSIER-COMPANY-NAME} submeteu na plataforma Five Credit, uma candidatura a um financiamento.\n\nCom o objetivo de dar continuidade ao processo, é-lhe solicitado o favor de confirmar e/ou atualizar a informação necessária, para efeitos de formalização:\n— Identificação dos representantes;\n— Identificação dos avalistas;\n— Dados de contacto para efeitos de comunicação;\n— Identificação da conta bancária de onde serão debitadas as prestações.\n\n[Clicar aqui...]\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nMuito obrigado,\nEquipa Five Credit"},
+  {n:21,title:"Download do Contrato Disponível (Envio ao User)",code:"DOSSIER-FORM-CONTRACT-DOWNLOAD",tags:["contrato"],subj:"Five Credit – Fase de Formalização. Disponibilização do Contrato - {DOSSIER-COMPANY-NAME}\n[Nota: Colocar em CC o email indicado pela mutuária para efeitos de contacto.]",body:"Exmo(a). {USER-NAME},\n\nInformamos que a informação contratual, necessária para a concessão do financiamento da empresa indicada abaixo, já se encontra disponível para consulta na nossa plataforma:\n— Condições gerais;\n— Condições particulares;\n— Anexo I às condições particulares – Plano de Financiamento;\n— Anexo II às condições particulares – Autorização de Débito Direto SEPA;\n— Anexo III às condições particulares - Livrança subscrita pela Mutuária e avalizada (original apenas disponibilizado na data agendada para assinatura do contrato).\n\nPara aceder às mesmas, clique no link abaixo indicado:\n[Clicar aqui…]\n\nInformamos que, no prazo máximo de 5 (cinco) dias úteis, será contactado via email para efeitos de agendamento da assinatura do contrato e que no dia da assinatura será necessário:\n— Carimbo da Empresa (caso este exista), para efeitos de assinatura do contrato e subscrição da livrança;\n— Fotocópia certificada da ata de aprovação da celebração do financiamento garantido por livrança e comprovativa dos poderes de representação. Ou, alternativamente, trazer o livro de atas para efeitos de consulta;\n— Se aplicável, original ou fotocópia certificada da Procuração comprovativa dos poderes de representação.\n\nIMPORTANTE: O contrato deverá ser carregado na plataforma exclusivamente após a assinatura de ambas as partes.\n\nMuito obrigado,\nEquipa Five Credit"},
+  {n:22,title:"Upload do Contrato Efetuado (Envio ao User)",code:"DOSSIER-FORM-CONTRACT-UPLOADED",tags:["contrato"],subj:"Five Credit – Fase de Formalização Confirmação de carregamento do Contrato - {DOSSIER-COMPANY-NAME}",body:"Exmo(a). {USER-NAME},\n\nConfirmamos que o Contrato já se encontra carregado na plataforma e que o montante de financiamento será creditado no prazo máximo de 5 dias úteis na conta indicada durante a fase de formalização, bem como na Autorização de Débito SEPA.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nMuito obrigado.\nEquipa Five Credit"},
+  {n:23,title:"Atualização de Informação / Documentação (Envio ao User)",code:"",tags:["manutencao"],subj:"Five Credit - Pedido Informação Trimestral / Documentação - {DOSSIER-COMPANY-NAME}",body:"Exmo(a) {USER-NAME},\n\nConforme previsto contratualmente e para efeitos de monitorização do crédito, foi iniciado o processo de atualização automática da informação contabilística, do Banco de Portugal, da Autoridade Tributária e Aduaneira e Segurança Social da Mutuária, semelhante à disponibilizada para efeitos de concessão do financiamento.\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nPor favor, proceda à atualização do seu processo utilizando o link abaixo indicado:\n[Clicar aqui...]\n\nPara mais informação, consulte, por favor, a alínea d) da Cláusula 16.1. das condições gerais do Contrato de Financiamento.\n\nEm caso de dúvidas não hesite em contactar-nos.\n\nMuito obrigado e até breve.\nEquipa Five Credit\n{IMG-LOGO}"},
+  {n:24,title:"Conclusão do Processo de Atualização (Envio ao User)",code:"",tags:["manutencao"],subj:"Five Credit - Concluído Processo de atualização - {DOSSIER-COMPANY-NAME}",body:"Exmo(a) {USER-NAME},\n\nInformamos que o processo de atualização de informação foi concluído com sucesso, relativamente ao seguinte financiamento:\n\nReferência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nMuito obrigado e até breve.\nEquipa Five Credit\n{IMG-LOGO}"},
+  {n:25,title:"Candidaturas Inativas – Aviso de Apagamento",code:"",tags:["manutencao","candidatura"],subj:"Five Credit - Candidatura inativa - {DOSSIER-COMPANY-NAME}",body:"Referência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nExmo(a). Senhor(a),\n\nA sua candidatura encontra-se inativa há mais de 30 dias, pelo que procederemos à eliminação da mesma na plataforma, nos termos da nossa política de gestão de candidaturas e política de privacidade e de proteção de dados.\n\nCaso pretenda retomar o processo de financiamento, deverá iniciar uma nova candidatura da seguinte forma:\n• Aceda à plataforma através deste link;\n• Faça login com as suas credenciais;\n• Inicie uma nova candidatura.\n\nSe tiver alguma dúvida ou necessitar de assistência durante este processo, estaremos à sua disposição através do e-mail support@fivecredit.pt ou do contacto telefónico 215973965.\n\nMuito obrigado e até breve.\nEquipa Five Credit\n{IMG-LOGO}"},
+  {n:26,title:"Aviso de Validade CRC",code:"",tags:["manutencao","candidatura"],subj:"Five Credit – Aviso de validade CRC - {DOSSIER-COMPANY-NAME}",body:"Referência: {DOSSIER-GUID}\nEmpresa: {DOSSIER-COMPANY-NAME}\nNIPC: {DOSSIER-COMPANY-NIF}\n\nExmo(a). {USER-NAME},\n\nA Certidão Permanente do Registo Comercial da empresa {DOSSIER-COMPANY-NAME} expira em {DOSSIER-COMPANY-CRC-VALID-UNTIL}.\n\nPara evitar interrupções no processo de atualização e validação dos dados, pedimos que proceda à renovação da certidão o mais brevemente possível.\n\nMuito obrigado,\nEquipa Five Credit\n{IMG-LOGO}"}
+];
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function reEsc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+function exVars(t){return[...new Set((t.match(/\{[A-Z0-9_-]+\}|\{\{[a-z]+\}\}/g)||[]))]}
+const allVars=new Set();
+T.forEach(t=>{exVars(t.body).forEach(v=>allVars.add(v));exVars(t.subj).forEach(v=>allVars.add(v))});
+document.getElementById('varCount').textContent=allVars.size;
+let cF='all',cS='';
+function hlText(text,q){const e=esc(text);if(!q)return e;return e.replace(new RegExp('('+reEsc(esc(q))+')','gi'),'<mark>$1</mark>')}
+function hlVars(text,q){let r=text.replace(/\{[A-Z0-9_-]+\}|\{\{[a-z]+\}\}/g,m=>'<span class="var-tag">'+m+'</span>');if(q)r=r.replace(new RegExp('('+reEsc(esc(q))+')','gi'),'<mark>$1</mark>');return r}
+function render(){
+  const q=cS.toLowerCase();let vis=0;
+  T.forEach(t=>{
+    const c=document.getElementById('c'+t.n);
+    const mf=cF==='all'||t.tags.includes(cF);
+    const ms=!q||(t.title+t.subj+t.body+t.code).toLowerCase().includes(q);
+    if(mf&&ms){c.classList.remove('hidden');vis++;c.querySelector('.card-title').innerHTML=hlText(t.title,cS);c.querySelector('.subject-text').innerHTML=hlText(t.subj,cS);c.querySelector('.card-body-content').innerHTML=hlVars(esc(t.body),cS);}
+    else c.classList.add('hidden');
+  });
+  document.getElementById('resultsCount').textContent=vis+' template'+(vis!==1?'s':'');
+  document.getElementById('noResults').style.display=vis===0?'flex':'none';
+  document.getElementById('emailCount').textContent=vis;
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const t=T.find(x=>x.n===+el.dataset.num);if(!t)return;
+    const mf=cF==='all'||t.tags.includes(cF);
+    const ms=!q||(t.title+t.subj+t.body+t.code).toLowerCase().includes(q);
+    el.style.opacity=(mf&&ms)?'1':'0.3';
+  });
+}
+function doSearch(v){cS=v;document.getElementById('sidebarSearch').value=v;render()}
+function syncSearch(v){cS=v;document.getElementById('mainSearch').value=v;render()}
+function setFilter(f,el){cF=f;document.querySelectorAll('.ftag').forEach(t=>t.classList.remove('active'));el.classList.add('active');render()}
+function toggleCard(n){document.getElementById('c'+n).classList.toggle('expanded')}
+function copyAll(n){
+  const t=T.find(x=>x.n===n);
+  navigator.clipboard.writeText('ASSUNTO: '+t.subj+'\n\n'+t.body).then(()=>{
+    const b=document.getElementById('cb'+n);b.classList.add('copied');b.textContent='✓ Copiado';
+    setTimeout(()=>{b.classList.remove('copied');b.innerHTML='<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11H2a1 1 0 01-1-1V2a1 1 0 011-1h8a1 1 0 011 1v1"/></svg> Copiar tudo';},2000);
+  });
+}
+function copySubj(n){const t=T.find(x=>x.n===n);navigator.clipboard.writeText(t.subj).then(()=>{const b=document.getElementById('sb'+n);const o=b.textContent;b.textContent='✓';setTimeout(()=>b.textContent=o,1500);})}
+function copyBody(n){const t=T.find(x=>x.n===n);navigator.clipboard.writeText(t.body).then(()=>{const b=document.getElementById('bb'+n);const o=b.textContent;b.textContent='✓ Copiado';setTimeout(()=>b.textContent=o,1500);})}
+/* build sidebar */
+const nav=document.getElementById('sidebarNav');
+T.forEach(t=>{
+  const el=document.createElement('div');el.className='nav-item';el.dataset.num=t.n;
+  el.innerHTML='<span class="nav-num">'+String(t.n).padStart(2,'0')+'</span><span style="flex:1">'+esc(t.title)+'</span>';
+  el.onclick=()=>{const c=document.getElementById('c'+t.n);c.scrollIntoView({behavior:'smooth',block:'start'});if(!c.classList.contains('expanded'))c.classList.add('expanded');document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');};
+  nav.appendChild(el);
+});
+/* build cards */
+const list=document.getElementById('templateList');
+T.forEach(t=>{
+  const card=document.createElement('div');card.className='tcard';card.id='c'+t.n;
+  const tagHtml=t.tags.map(tag=>'<span class="ctag">'+tag+'</span>').join('')+(t.code?'<span class="ctag code">'+t.code+'</span>':'');
+  card.innerHTML=`<div class="card-hdr" onclick="toggleCard(${t.n})">
+    <div class="card-num-badge">${String(t.n).padStart(2,'0')}</div>
+    <div class="card-meta"><div class="card-title">${esc(t.title)}</div><div class="card-tags">${tagHtml}</div></div>
+    <svg class="card-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="card-body">
+    <div class="card-subject">
+      <span class="subject-label">Assunto</span>
+      <span class="subject-text">${esc(t.subj)}</span>
+      <button class="btn btn-ghost" id="sb${t.n}" style="flex-shrink:0;margin-left:8px" onclick="copySubj(${t.n})">Copiar</button>
+    </div>
+    <div class="card-body-content">${hlVars(esc(t.body),'')}</div>
+    <div class="card-actions">
+      <button class="btn btn-ghost" id="bb${t.n}" onclick="copyBody(${t.n})">Copiar corpo</button>
+      <button class="btn btn-primary" id="cb${t.n}" onclick="copyAll(${t.n})"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="9" height="9" rx="1"/><path d="M3 11H2a1 1 0 01-1-1V2a1 1 0 011-1h8a1 1 0 011 1v1"/></svg> Copiar tudo</button>
+    </div>
+  </div>`;
+  list.appendChild(card);
+});
+
+/* ══════════════════════════════════════
+   FLUXO DE TAREFAS — data & logic
+══════════════════════════════════════ */
+const P=[
+  {id:'p1',label:'Registo',steps:[
+    {n:'01',t:'Início',s:'Acesso à plataforma',a:['emp'],items:['Selecionar "Pedir financiamento"','Selecionar "Registo com email" ou registar com "Google" ou "LinkedIn"','Recebe email com token'],note:''},
+    {n:'02',t:'Registo na plataforma',s:'Criar conta de acesso',a:['emp'],items:['Selecionar "Registe-se"','Nome do representante da Empresa','Email','NIF','Telemóvel — Enviar código','Código de validação — Validar código','Aceitar Termos e Privacidade','Validar e Submeter'],note:'Sem ação de backoffice.'},
+    {n:'03',t:'Validação do email',s:'Autenticação por código',a:['emp','cre'],items:['Inserir email do representante','Sistema envia código de validação (até 3 min — verificar SPAM)','Inserir código e validar'],note:'Sem ação de backoffice.'},
+    {n:'04',t:'Validação do telemóvel',s:'Autenticação por SMS',a:['emp','cre'],items:['Inserir número de telemóvel','Sistema envia SMS com código (até 3 min)','Inserir código e validar'],note:'Emails 2 e 3 para alteração de password.'},
+  ]},
+  {id:'p2',label:'Candidatura',steps:[
+    {n:'05',t:'Criação de candidatura',s:'Produto, montante e finalidade',a:['emp','cre'],items:['Escolher produto de financiamento','Escolher montante pretendido','Escolher finalidade(s) de financiamento','Validar e submeter'],note:''},
+    {n:'06',t:'Requisitos da candidatura',s:'Elegibilidade via código CRC',a:['emp','cre'],items:['Introduzir código CRC','Sistema verifica elegibilidade (até 3 min)','Requisitos: faturação ≥ 100k€, ≥ 3 anos de atividade, situação regularizada AT, SS e Justiça'],note:'Email 4 ou 5 com resultado.'},
+    {n:'07',t:'Contabilista — identificação',s:'Dados de contacto do CC',a:['emp','cre'],items:['Nome do Contabilista Certificado (CC)','Número de telefone e email do CC','Sistema envia link seguro ao CC','Avisar o CC que vai receber email da plataforma'],note:'Email 6.'},
+  ]},
+  {id:'p3',label:'Documentos',steps:[
+    {n:'08',t:'CC — Upload de informação Financeira',s:'Extração via Five Extractor',a:['con','cre'],items:['CC recebe email e clica no 1.º link','Instalar Five Extractor (Apple ou Microsoft)','Extrair dados e guardar Excel no PC','2.º link → Upload ficheiros na plataforma'],note:'Emails 7, 8 e 9.'},
+    {n:'09',t:'Instalar extensão Doc Sync',s:'Recolha automática no Chrome',a:['emp','cre'],items:['Instalar extensão Five Credit Doc Sync','Pop-up: Adicionar extensão','Ícone puzzle → 3 pontos → Gerir extensão','Permitir acesso a URLs de arquivo','Fechar browser e validar extensão'],note:''},
+    {n:'10',t:'Recolha automática — Banco de Portugal',s:'Via extensão',a:['emp','cre'],items:['Site Five Credit: Banco de Portugal','Atualizar extensão → Recolher documentos','Autenticar no site do BDP','Extensão recolhe dados para análise de crédito'],note:''},
+    {n:'11',t:'Recolha manual — Banco de Portugal',s:'Base de Dados de Contas',a:['emp','cre'],items:['Aceder à Base de Dados de Contas','Aceitar condições de acesso à BCB','Autenticar e obter mapa','Repetir para Mapa de Responsabilidades e Restrição de Cheques'],note:'Não alterar nome nem formato dos ficheiros.'},
+    {n:'12',t:'Recolha automática — Segurança Social',s:'Via extensão',a:['emp','cre'],items:['Site Five Credit: Segurança Social','Atualizar extensão → Recolher documentos','Login no site da SS','Extensão recolhe automaticamente'],note:''},
+    {n:'13',t:'Recolha manual — Segurança Social',s:'Declaração de Não Dívida',a:['emp','cre'],items:['Aceder à Declaração de Não Dívida','Login no site da SS → Obter nova declaração','Browse → selecionar documento → Submeter'],note:''},
+    {n:'14',t:'Recolha automática — Autoridade Tributária',s:'Via extensão',a:['emp','cre'],items:['Site Five Credit: Autoridade Tributária','Atualizar extensão → Recolher documentos','Login no site da AT'],note:''},
+    {n:'15',t:'Recolha manual — Autoridade Tributária',s:'Declaração de Não Dívida',a:['emp','cre'],items:['Aceder à Declaração de Não Dívida','Login no site da AT','Certidão de Dívida/Não Dívida → Confirmar','Renomear ficheiro .action → .pdf','Browse → Submeter'],note:'Guardar com "Todos os ficheiros".'},
+    {n:'16',t:'Verificar processo do CC',s:'Confirmação de upload informação financeira',a:['emp','cre'],items:['Confirmar se o CC efetuou o upload','Se não efetuou: reenviar email e aguardar','Se efetuou: avançar para próximo passo'],note:'Emails 8 e 9.'},
+  ]},
+  {id:'p4',label:'Avaliação',steps:[
+    {n:'17',t:'Submeter candidatura',s:'Submissão final',a:['emp'],items:['Confirmar todos os dados','Submeter candidatura','Pop-up: confirmar submissão','Aguardar email de avaliação'],note:''},
+    {n:'17.1',t:'Backoffice — aceitar ou rejeitar',s:'Análise financeira',a:['bac'],items:['Login como Análise Financeira','Selecionar empresa candidata no dashboard','Clicar no lápis','OK → Crédito (inicia simulação)','KO → Rejeitar (email ao candidato)'],note:'Emails 10 ou 11.'},
+    {n:'18',t:'Simulação de crédito',s:'Simulador de crédito',a:['emp','cre'],items:['Clicar no link recebido por email','Login no site Five Credit','Efetuar simulação e calcular plano de pagamentos','Guardar, confirmar e submeter simulação','Aguardar aceitação'],note:'Email 10.'},
+    {n:'18.1',t:'Backoffice — aceitar/rejeitar simulação',s:'Aprovação pelo Board',a:['bac'],items:['Board (2 de 3): aceitar ou rejeitar simulação','Aceitação → inicia processo de RCBE'],note:'Email 12.'},
+  ]},
+  {id:'p5',label:'KYC & RCBE',steps:[
+    {n:'18',t:'Backoffice — criar estrutura KYC & ESG',s:'Com base em RCBE, CRC e SABI',a:['com','bac'],items:['Compliance cria estrutura KYC','Selecionar fontes (RCBE, CRC, SABI) → Concluir','Confirmar dados de quem responde ao KYC','Iniciar KYC → Submeter'],note:'Email 17.'},
+    {n:'19',t:'KYC & ESG — preenchimento',s:'Empresa preenche questionários',a:['emp'],items:['Clicar no link de preenchimento KYC & ESG','Preencher campos obrigatórios e avalistas','Documentos: certidões AT e SS, IRS, recibos, evidência de património','Submeter KYC e aceitar RGPD'],note:'Emails 17, 18 e 19.'},
+    {n:'19.1',t:'Backoffice — revisão KYC',s:'Compliance verifica documentação',a:['com','bac'],items:['Login em KYC.FiveCredit → Iniciar revisão','Confirmar ou rejeitar dados e documentação','Verificar PEPs e Medidas Restritivas (Dow Jones)','Consultar Base Geral, CIRE e Lista Pública de Execuções','CRC do Banco de Portugal'],note:'Só finalizar após validação dos avalistas.'},
+    {n:'19.2',t:'Procedimento avalistas',s:'Compliance + Análise Financeira',a:['com','bac'],items:['Estandardizar ficheiros: irs_NIF.pdf, imi_NIF.pdf','Realizar o scoring do avalista','Caso o rating seja A ou B, esperar pela aprovação da Board','Arquivar na pasta do avalista'],note:''},
+  ]},
+  {id:'p6',label:'Formalização',steps:[
+    {n:'20',t:'Informação contratual',s:'Dados pré-contratuais',a:['emp','cre'],items:['Clicar no link recebido por email','Confirmar avalistas, representantes e conta bancária','Submeter e sair'],note:'Email 20.'},
+    {n:'20.1',t:'Backoffice — formalização do contrato',s:'Compliance e Board',a:['com','bac'],items:['Confirmar dados e guardar → Submeter','Contrato gerado automaticamente em PDF','Board (2 de 3): aceitar ou rejeitar','Contrato disponível na plataforma'],note:'Email 21.'},
+    {n:'21',t:'Download e upload do contrato',s:'Assinatura e entrega',a:['emp','com'],items:['Empresa recebe email de agendamento','Comparecer com: BI/passaporte, carimbo, ata de aprovação, procuração (se aplicável)','Compliance digitaliza e envia à empresa','Upload: Contrato + Autorização de Débito + Livrança (PDF)'],note:''},
+    {n:'21.1',t:'Backoffice — aprovação final',s:'Candidatura completa',a:['com','bac'],items:['Compliance verifica conformidade dos documentos','Aceder → Aprovar → Confirmar','Candidatura passa ao estado "Completo"','Departamento Financeiro inicia transferência'],note:''},
+    {n:'22',t:'Imposto de Selo',s:'Apuramento mensal',a:['bac'],items:['Apurar: colunas Stamp, Stamp on Loan, Stamp on Fees','Enviar ao Contabilista Certificado (EY)','Confirmar internamente','Guia de pagamento até ao dia 20 do mês seguinte'],note:''},
+    {n:'23',t:'Faturação',s:'Emissão de faturas mensais',a:['bac'],items:['Contratos em curso: Interest e Stamp','Novos contratos: Opening Fee, Stamp on Loan e Stamp on Fee','EY emite e envia até ao dia 5','Suporte envia via finance@fivecredit.pt'],note:''},
+    {n:'24',t:'Débitos diretos',s:'Marathon → Bankinter → Sibs',a:['bac'],items:['Marathon envia informação ao Bankinter (D−5)','Bankinter → Sibs','Email automático com info da 1.ª tentativa de débito','Cálculo manual dos juros através do analista financeiro e posterior envio para o departamento responsável pelos DD (IT) para ser feito a nova tentativa de débito.'],note:''},
+  ]},
+];
+const BC={emp:'b-emp',cre:'b-cre',bac:'b-bac',con:'b-con',com:'b-com',dec:'b-dec'};
+const BL={emp:'Empresa',cre:'Creditscore',bac:'Backoffice',con:'Contabilista',com:'Compliance',dec:'Declarante'};
+let curP='p1';
+function phF(){return P.find(x=>x.id===curP)}
+function renderPhases(){
+  const idx=P.findIndex(x=>x.id===curP);
+  document.getElementById('progBar').style.width=Math.round((idx+1)/P.length*100)+'%';
+  document.getElementById('progLabel').textContent='Fase '+(idx+1)+' de '+P.length;
+  document.getElementById('phases').innerHTML=P.map(x=>`<div class="ph${x.id===curP?' active':''}" onclick="goP('${x.id}')"><span class="ph-count">${x.steps.length} passos</span>${x.label}</div>`).join('');
+}
+function renderSteps(){
+  document.getElementById('stepsList').innerHTML=phF().steps.map((s,i)=>`
+    <div class="step-card" id="sc${i}">
+      <div class="step-head" onclick="togS(${i})">
+        <div class="step-num">${s.n}</div>
+        <div class="step-text"><div class="step-title">${s.t}</div><div class="step-sub">${s.s}</div></div>
+        <div class="step-badges">${s.a.map(a=>`<span class="sbadge ${BC[a]}">${BL[a]}</span>`).join('')}</div>
+        <span class="step-chev">▾</span>
+      </div>
+      <div class="step-detail" id="sd${i}">
+        <ul class="detail-list">${s.items.map(it=>`<li><span class="detail-dot"></span>${it}</li>`).join('')}</ul>
+        ${s.note?`<div class="detail-note">${s.note}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+function togS(i){
+  const sc=document.getElementById('sc'+i);
+  const sd=document.getElementById('sd'+i);
+  const open=sc.classList.toggle('open');
+  sd.style.display=open?'block':'none';
+}
+function goP(id){curP=id;renderPhases();renderSteps()}
+renderPhases();
+renderSteps();
+
+/* ══════════════════════════════════════
+   POLÍTICA DE COMPLIANCE — data & logic
+══════════════════════════════════════ */
+const COMP=[
+  {id:'c1',num:'01',title:'Introdução',color:'#3b5fc0',
+   desc:'Estabelece o âmbito e os destinatários da política. Qualquer violação pode expor colaboradores e a Sociedade a sanções criminais, contraordenacionais ou disciplinares da CMVM, bem como a danos reputacionais e perdas financeiras.',
+   items:[
+     {t:'Pessoas Cobertas',n:'Todos os colaboradores e membros dos órgãos sociais da Circle Capital'},
+     {t:'Declaração obrigatória',n:'Cada Pessoa Coberta assina e entrega o Apêndice 1 ao Responsável de Compliance'},
+     {t:'Consequências de incumprimento',n:'Sanções criminais, contraordenacionais, disciplinares, danos reputacionais e perdas financeiras'},
+   ]},
+  {id:'c2',num:'02',title:'Função de Compliance',color:'#1a3fd4',
+   desc:'Define o risco de compliance, os 8 tipos de risco identificados e os 15 objetivos concretos da função. A Função de Compliance é independente, autónoma e livre de conflitos de interesses.',
+   items:[
+     {t:'8 tipos de risco',n:'Legais, regulamentares, branqueamento de capitais, legislativos, sancionatórios, contratuais, contencioso e reputacional'},
+     {t:'15 objetivos concretos',n:'Emitir pareceres, garantir formação, monitorizar riscos, reportar à CMVM, elaborar relatórios anuais, entre outros'},
+     {t:'Independência e autonomia',n:'Sem envolvimento na prestação de serviços da Sociedade ou dos fundos sob gestão'},
+     {t:'Protocolo de resposta a incidentes',n:'Avaliar → medidas corretivas → comunicar ao CA → monitorizar → relatório final → base de dados'},
+     {t:'Revisão periódica da política',n:'Propostas de revisão submetidas à aprovação do Conselho de Administração'},
+   ]},
+  {id:'c3',num:'03',title:'Princípios de Compliance',color:'#0f7a5c',
+   desc:'Oito princípios de conduta ética e profissional que todas as Pessoas Cobertas devem respeitar e aplicar no exercício das suas funções.',
+   items:[
+     {t:'Cultura ética e profissional',n:'Rejeição de práticas ilegais; promoção de integridade, boa-fé e honestidade'},
+     {t:'Cumprimento legal e regulamentar',n:'Formação contínua obrigatória; atualização permanente de conhecimentos'},
+     {t:'Lealdade e responsabilidade',n:'Proibição de atividades concorrentes, diretas ou indiretas, com a Circle Capital'},
+     {t:'Combate à corrupção e branqueamento',n:'Proibido aceitar qualquer benefício direto ou indireto que possa influenciar o comportamento'},
+     {t:'Proteção dos interesses dos investidores',n:'Sem conflitos de interesse; reclamações de investidores tratadas de forma adequada'},
+     {t:'Confidencialidade',n:'Sigilo sobre dados financeiros, clientes, segredos de negócio, infraestruturas TI e estratégias comerciais'},
+     {t:'Evitar conflitos de interesses',n:'Comunicação imediata ao Responsável; abstenção do processo decisório em caso de conflito'},
+     {t:'Igualdade e proibição de assédio',n:'Proibição de assédio moral e sexual; direito a indemnização por atos discriminatórios'},
+   ]},
+  {id:'c4',num:'04',title:'Responsável pela Função de Compliance',color:'#185fa5',
+   desc:'Define os requisitos de designação, perfil profissional e responsabilidades do Responsável de Compliance. A designação é comunicada à CMVM, que pode ou não aceitá-la.',
+   items:[
+     {t:'Designação pelo Conselho de Administração',n:'Com autoridade, independência, recursos adequados e acesso a toda a informação relevante'},
+     {t:'Requisitos de adequação profissional',n:'Habilitações literárias, capacidade técnica, experiência e ausência de conflitos de interesses'},
+     {t:'Comunicação obrigatória à CMVM',n:'A CMVM avalia a experiência e habilitações do candidato, podendo não aceitar a designação'},
+     {t:'Responsabilidades operacionais',n:'Identificar riscos, monitorizar políticas, gerir reclamações, documentar trabalho, propor medidas corretivas'},
+   ]},
+  {id:'c5',num:'05',title:'Relatórios de Compliance',color:'#b06a10',
+   desc:'Define os relatórios obrigatórios, a sua periodicidade, prazo e conteúdo mínimo. O relatório principal deve ser submetido ao Conselho de Administração até ao final de maio de cada ano.',
+   items:[
+     {t:'Relatório anual de eficácia do controlo',n:'Prazo: final de maio; dirigido ao CA e posteriormente remetido à CMVM'},
+     {t:'Conteúdo mínimo obrigatório',n:'Organograma, deficiências detetadas, riscos identificados, avaliação do controlo, queixas recebidas'},
+     {t:'Relatório anual de compliance ao CA',n:'Meios humanos e técnicos, objetivos executados, alterações de governação, observações relevantes'},
+     {t:'Relatórios extraordinários',n:'Sempre que exista deficiência detetada ou risco significativo de incumprimento pela Sociedade'},
+   ]},
+  {id:'c6',num:'06',title:'Manutenção de Registos',color:'#3b6d11',
+   desc:'Regras de arquivo, acesso restrito e prazos de conservação de documentos. O acesso é restrito ao Responsável de Compliance e ao Conselho de Administração.',
+   items:[
+     {t:'Armazenamento digital e físico',n:'Cópias de segurança regulares; sistema informático seguro com duplicação periódica'},
+     {t:'Prazo geral de conservação: 5 anos',n:'Contado desde a data da operação, cessação de contrato ou produção do documento'},
+     {t:'Prazo especial: 7 anos',n:'Aplicável a documentos de prevenção de branqueamento de capitais e financiamento do terrorismo'},
+     {t:'Documentos de manutenção obrigatória',n:'Incidentes, conflitos, incumprimentos, correspondência CMVM, ordens de subscrição/resgate, reclamações, subcontratação'},
+   ]},
+  {id:'c7',num:'07',title:'Guia para Gestão de Visitas',color:'#993c1d',
+   desc:'Procedimentos para visitas de entidades reguladoras, autoridades governamentais, investigadores e prestadores de serviços. Nenhum Visitante Oficial pode ficar desacompanhado.',
+   items:[
+     {t:'Visitantes Oficiais: acompanhamento obrigatório',n:'Reguladores, agências governamentais e investigadores — nunca deixados desacompanhados'},
+     {t:'Verificação de identidade',n:'Obrigatória para representantes de autoridades reguladoras e policiais'},
+     {t:'Transmissão de documentos proibida',n:'Expressamente proibida sem validação prévia por um Acompanhante autorizado'},
+     {t:'Entrevistas por Visitantes Oficiais',n:'Agendadas antecipadamente; Acompanhante sempre presente na sala'},
+     {t:'Visitantes de Longa Duração',n:'Auditores e consultores: verificação de identidade + cartão de acesso às áreas necessárias'},
+   ]},
+  {id:'ca1',num:'A1',title:'Apêndice 1 — Recibo da Política',color:'#5f5e5a',
+   desc:'Declaração individual a assinar por cada Pessoa Coberta, confirmando a leitura, compreensão e aceitação da Política de Compliance.',
+   items:[
+     {t:'Campos obrigatórios',n:'Nome, Área, Cargo, Data, Local e Assinatura'},
+     {t:'Compromisso de cumprimento',n:'Não infringir as disposições e comunicar qualquer alteração ao Responsável de Compliance'},
+     {t:'Responsabilidade declarada',n:'A infração implica responsabilidade disciplinar, civil, penal, pessoal e profissional'},
+   ]},
+];
+
+(function buildComp(){
+  const acc=document.getElementById('compAcc');
+  COMP.forEach(function(s){
+    const card=document.createElement('div');
+    card.className='cacc-card';
+    card.innerHTML=
+      '<div class="cacc-hdr" onclick="togComp(\''+s.id+'\')">'
+        +'<div class="cacc-badge">'+s.num+'</div>'
+        +'<div class="cacc-title">'+s.title+'</div>'
+        +'<span class="cacc-count">'+s.items.length+' tópicos</span>'
+        +'<svg class="cacc-chev" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      +'</div>'
+      +'<div class="cacc-body" id="cb-'+s.id+'">'
+        +'<p class="cacc-desc">'+s.desc+'</p>'
+        +'<div class="cacc-items">'
+          +s.items.map(function(it){
+            return '<div class="cacc-item">'
+              +'<span class="cacc-dot" style="background:'+s.color+'"></span>'
+              +'<div><div class="cacc-item-title">'+it.t+'</div>'
+              +(it.n?'<div class="cacc-item-note">'+it.n+'</div>':'')
+              +'</div></div>';
+          }).join('')
+        +'</div>'
+      +'</div>';
+    acc.appendChild(card);
+  });
+})();
+
+function togComp(id){
+  var card=document.querySelector('[onclick="togComp(\''+id+'\')"]').parentElement;
+  card.classList.toggle('open');
+}
+</script>
+</body>
+</html>
